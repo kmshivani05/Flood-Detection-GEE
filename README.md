@@ -22,7 +22,11 @@ This project uses \*\*Sentinel-1 SAR (Synthetic Aperture Radar)\*\* data, which 
 
 
 
-!\[Flood Detection Output](output.png)
+<p align="center">
+
+&#x20; <img src="./output.png" width="650"/>
+
+</p>
 
 
 
@@ -74,7 +78,7 @@ The goal of this project is to:
 
 &#x20; \* High flood vulnerability
 
-&#x20; \* Flat terrain with seasonal inundation
+&#x20; \* Flat terrain
 
 
 
@@ -92,7 +96,7 @@ The goal of this project is to:
 
 \* Dataset: `COPERNICUS/S1\_GRD`
 
-\* Mode: IW (Interferometric Wide Swath)
+\* Mode: IW
 
 \* Polarization: VV
 
@@ -106,7 +110,7 @@ The goal of this project is to:
 
 \* Dataset: `JRC/GSW1\_4/GlobalSurfaceWater`
 
-\* Purpose: Remove permanent water bodies
+\* Used to remove permanent water
 
 
 
@@ -118,7 +122,7 @@ The goal of this project is to:
 
 
 
-\### 5.1 Time Selection
+\### Time Selection
 
 
 
@@ -128,7 +132,7 @@ The goal of this project is to:
 
 
 
-Median images are computed to reduce temporal noise.
+Median composites are used to reduce noise.
 
 
 
@@ -136,17 +140,11 @@ Median images are computed to reduce temporal noise.
 
 
 
-\### 5.2 SAR-Based Water Detection
+\### Water Detection
 
 
 
-\* Water appears \*\*dark\*\* in SAR (low backscatter)
-
-\* Land appears \*\*brighter\*\*
-
-
-
-Threshold used:
+Water in SAR appears dark (low backscatter):
 
 
 
@@ -162,11 +160,7 @@ Backscatter < -17 dB → Water
 
 
 
-\### 5.3 Flood Extraction
-
-
-
-Flood is defined as:
+\### Flood Extraction
 
 
 
@@ -178,7 +172,7 @@ Flood = After Water AND NOT Before Water
 
 
 
-This ensures only \*\*newly flooded regions\*\* are captured.
+This captures only \*\*new flood regions\*\*.
 
 
 
@@ -186,17 +180,13 @@ This ensures only \*\*newly flooded regions\*\* are captured.
 
 
 
-\### 5.4 Permanent Water Removal
+\### Permanent Water Removal
 
 
 
-Using JRC dataset:
+\* Pixels with >50% water occurrence removed
 
-
-
-\* Pixels with >50% water occurrence are removed
-
-\* Ensures lakes and rivers are excluded
+\* Ensures rivers/lakes are excluded
 
 
 
@@ -204,15 +194,15 @@ Using JRC dataset:
 
 
 
-\### 5.5 Noise Reduction
+\### Noise Reduction
 
 
 
-\* Focal mean filter applied
+\* Focal mean filtering
 
-\* Connected pixel filtering removes small noisy patches
+\* Connected pixel filtering
 
-\* Morphological smoothing improves spatial continuity
+\* Morphological smoothing
 
 
 
@@ -220,15 +210,15 @@ Using JRC dataset:
 
 
 
-\### 5.6 Flood Area Calculation
+\### Area Calculation
 
 
 
-\* Pixel area computed using `pixelArea()`
+\* Pixel area → `pixelArea()`
 
-\* Summed using `reduceRegion()`
+\* Summation → `reduceRegion()`
 
-\* Converted to square kilometers
+\* Converted to sq km
 
 
 
@@ -242,15 +232,17 @@ Using JRC dataset:
 
 \* \*\*Estimated Flood Area:\*\* \~550 sq km
 
-\* Flood distribution observed:
+
+
+\### Observations:
 
 
 
-&#x20; \* Along river channels
+\* Flood clusters along river channels
 
-&#x20; \* Across floodplains
+\* Spread into surrounding plains
 
-&#x20; \* Near low elevation zones
+\* Dense concentration near Brahmaputra basin
 
 
 
@@ -262,11 +254,9 @@ Using JRC dataset:
 
 
 
-\* Grayscale: SAR imagery
+\* Grayscale → SAR imagery
 
-\* Blue overlay: Flooded areas
-
-\* Clear clustering near Brahmaputra river basin
+\* Blue overlay → Flooded regions
 
 
 
@@ -330,7 +320,7 @@ ee.Initialize()
 
 
 
-\### Run Notebook
+\### Run
 
 
 
@@ -386,11 +376,11 @@ Flood-Detection-GEE/
 
 
 
-\* Threshold-based detection may misclassify wet soil
+\* Threshold method may misclassify wet soil
 
 \* No ground truth validation
 
-\* SAR shadow effects in hilly regions
+\* SAR shadow issues in hilly regions
 
 
 
@@ -402,15 +392,15 @@ Flood-Detection-GEE/
 
 
 
-\* NDVI-based vegetation damage analysis
+\* NDVI-based flood impact analysis
 
-\* DEM-based terrain correction
+\* DEM-based correction
 
-\* Machine learning flood classification
+\* ML-based classification
 
-\* Multi-date flood progression mapping
+\* Time-series flood tracking
 
-\* Web dashboard for real-time monitoring
+\* Interactive dashboard
 
 
 
@@ -418,15 +408,15 @@ Flood-Detection-GEE/
 
 
 
-\## 13. Key Highlights
+\## 13. Highlights
 
 
 
-\* Uses SAR for all-weather flood detection
+\* Works in all weather conditions (SAR)
 
-\* Efficient large-scale processing with GEE
+\* Cloud-based large-scale processing
 
-\* Clean flood extraction using logical masking
+\* Clean flood extraction pipeline
 
 \* Accurate area estimation
 
@@ -440,7 +430,7 @@ Flood-Detection-GEE/
 
 
 
-Shivani Negi
+\*\*Shivani Negi\*\*
 
 GitHub: https://github.com/kmshivani05
 
@@ -454,7 +444,7 @@ GitHub: https://github.com/kmshivani05
 
 
 
-\* Sentinel-1 SAR (ESA)
+\* ESA Sentinel-1
 
 \* Google Earth Engine Docs
 
