@@ -58,9 +58,11 @@ This project detects flood-affected areas using Sentinel-1 SAR satellite data. I
 
 
 
-!\[Flood Map](output.png)
+<p align="center">
 
+&#x20; <img src="output.png" width="700"/>
 
+</p>
 
 \---
 
