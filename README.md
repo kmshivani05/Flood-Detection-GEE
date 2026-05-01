@@ -1,60 +1,4 @@
-\# Flood Detection using Google Earth Engine (Python)
-
-
-
-\## Overview
-
-
-
-This project detects flood-affected areas using Sentinel-1 SAR satellite data. It compares pre-flood and post-flood imagery to identify newly inundated regions and estimate total flood extent.
-
-
-
-\---
-
-
-
-\## Methodology
-
-
-
-\* Sentinel-1 SAR data (VV polarization) is used
-
-\* Pre-flood and post-flood images are processed
-
-\* Backscatter thresholding identifies water bodies
-
-\* Permanent water is removed using JRC Global Surface Water dataset
-
-\* Noise is reduced using connectivity filtering
-
-\* Spatial smoothing is applied for continuous flood regions
-
-\* Flood area is calculated using pixel area
-
-
-
-\---
-
-
-
-\## Results
-
-
-
-\* Estimated Flood Area: \*\*\~550 sq km\*\*
-
-\* Region: Assam, India
-
-\* Flood areas are clearly visible along river basins and nearby plains
-
-
-
-\---
-
-
-
-\## Output Visualization
+\# 🌊 Flood Detection using Google Earth Engine (Python)
 
 
 
@@ -64,11 +8,75 @@ This project detects flood-affected areas using Sentinel-1 SAR satellite data. I
 
 </p>
 
+
+
+<p align="center">
+
+&#x20; <b>Detecting flood-affected regions using Sentinel-1 SAR satellite data</b>
+
+</p>
+
+
+
 \---
 
 
 
-\## Tech Stack
+\## 📌 Overview
+
+
+
+This project uses \*\*Synthetic Aperture Radar (SAR)\*\* data from Sentinel-1 to detect flood-affected areas.
+
+By comparing pre-flood and post-flood satellite images, the model identifies newly inundated regions and estimates total flood extent.
+
+
+
+\---
+
+
+
+\## ⚙️ Methodology
+
+
+
+1\. Collect Sentinel-1 SAR data (VV polarization)
+
+2\. Generate \*\*Before\*\* and \*\*After\*\* composite images
+
+3\. Apply backscatter thresholding to detect water
+
+4\. Remove permanent water using JRC dataset
+
+5\. Apply noise filtering (connected pixel analysis)
+
+6\. Perform spatial smoothing for better region continuity
+
+7\. Calculate flood area using pixel-based estimation
+
+
+
+\---
+
+
+
+\## 📊 Results
+
+
+
+\* \*\*Estimated Flood Area:\*\* \~550 sq km
+
+\* \*\*Region:\*\* Assam, India
+
+\* Flood regions align with river basins and floodplains
+
+
+
+\---
+
+
+
+\## 🛰️ Technologies Used
 
 
 
@@ -78,53 +86,7 @@ This project detects flood-affected areas using Sentinel-1 SAR satellite data. I
 
 \* Geemap
 
-
-
-\---
-
-
-
-\## How to Run
-
-
-
-1\. Install dependencies:
-
-
-
-&#x20;  ```
-
-&#x20;  pip install earthengine-api geemap
-
-&#x20;  ```
-
-
-
-2\. Authenticate:
-
-
-
-&#x20;  ```
-
-&#x20;  import ee
-
-&#x20;  ee.Authenticate()
-
-&#x20;  ee.Initialize()
-
-&#x20;  ```
-
-
-
-3\. Run the script:
-
-
-
-&#x20;  ```
-
-&#x20;  python flood\_detection.py
-
-&#x20;  ```
+\* Sentinel-1 SAR Data
 
 
 
@@ -132,17 +94,53 @@ This project detects flood-affected areas using Sentinel-1 SAR satellite data. I
 
 
 
-\## Key Learnings
+\## 🚀 How to Run
+
+
+
+```bash
+
+pip install earthengine-api geemap
+
+```
+
+
+
+```python
+
+import ee
+
+ee.Authenticate()
+
+ee.Initialize()
+
+```
+
+
+
+```bash
+
+python flood\_detection.py
+
+```
+
+
+
+\---
+
+
+
+\## 🧠 Key Learnings
 
 
 
 \* SAR-based flood detection using backscatter analysis
 
-\* Handling noise in satellite imagery
+\* Handling speckle noise in satellite imagery
 
 \* Spatial filtering and smoothing techniques
 
-\* Working with Google Earth Engine in Python
+\* Cloud-based geospatial analysis with Earth Engine
 
 
 
@@ -150,15 +148,17 @@ This project detects flood-affected areas using Sentinel-1 SAR satellite data. I
 
 
 
-\## Future Improvements
+\## 🔮 Future Improvements
 
 
 
-\* Integrate NDVI to assess vegetation damage
+\* NDVI-based vegetation damage analysis
 
-\* Use machine learning for improved classification
+\* Multi-date flood progression tracking
 
-\* Add multi-date flood progression analysis
+\* Machine learning-based classification
+
+\* Integration with real-time disaster monitoring
 
 
 
@@ -166,9 +166,13 @@ This project detects flood-affected areas using Sentinel-1 SAR satellite data. I
 
 
 
-\## Author
+\## 👩‍💻 Author
 
 
 
-Shivani Negi
+\*\*Shivani Negi\*\*
+
+GitHub: https://github.com/kmshivani05
+
+
 
