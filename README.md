@@ -1,20 +1,4 @@
-\# 🌊 Flood Detection using Google Earth Engine (Python)
-
-
-
-<p align="center">
-
-&#x20; <img src="output.png" width="700"/>
-
-</p>
-
-
-
-<p align="center">
-
-&#x20; <b>Detecting flood-affected regions using Sentinel-1 SAR satellite data</b>
-
-</p>
+\# Flood Detection using Sentinel-1 SAR and Google Earth Engine (Python)
 
 
 
@@ -22,37 +6,19 @@
 
 
 
-\## 📌 Overview
+\## 1. Introduction
 
 
 
-This project uses \*\*Synthetic Aperture Radar (SAR)\*\* data from Sentinel-1 to detect flood-affected areas.
-
-By comparing pre-flood and post-flood satellite images, the model identifies newly inundated regions and estimates total flood extent.
+Floods are one of the most frequent and damaging natural disasters, particularly in regions with extensive river systems such as Assam, India. Traditional optical satellite methods often fail during flood events due to heavy cloud cover.
 
 
 
-\---
+This project implements a \*\*satellite-based flood detection pipeline\*\* using \*\*Sentinel-1 Synthetic Aperture Radar (SAR)\*\* data, which is capable of capturing surface conditions regardless of weather or daylight.
 
 
 
-\## ⚙️ Methodology
-
-
-
-1\. Collect Sentinel-1 SAR data (VV polarization)
-
-2\. Generate \*\*Before\*\* and \*\*After\*\* composite images
-
-3\. Apply backscatter thresholding to detect water
-
-4\. Remove permanent water using JRC dataset
-
-5\. Apply noise filtering (connected pixel analysis)
-
-6\. Perform spatial smoothing for better region continuity
-
-7\. Calculate flood area using pixel-based estimation
+The system detects \*\*newly inundated areas\*\* by comparing temporal satellite observations and applies spatial filtering techniques to produce reliable flood maps.
 
 
 
@@ -60,15 +26,291 @@ By comparing pre-flood and post-flood satellite images, the model identifies new
 
 
 
-\## 📊 Results
+\## 2. Problem Statement
+
+
+
+The objective is to:
+
+
+
+\* Detect flood-affected regions using SAR imagery
+
+\* Distinguish \*\*temporary flood water\*\* from permanent water bodies
+
+\* Reduce speckle noise inherent in SAR data
+
+\* Generate a clean flood mask
+
+\* Estimate total flooded area in square kilometers
+
+
+
+\---
+
+
+
+\## 3. Study Area
+
+
+
+\* \*\*Region:\*\* Assam, India
+
+\* \*\*Coordinates:\*\* \[91, 25, 93, 27]
+
+\* \*\*Geographical Characteristics:\*\*
+
+
+
+&#x20; \* Dominated by Brahmaputra river basin
+
+&#x20; \* High flood vulnerability due to flat terrain
+
+&#x20; \* Seasonal monsoon flooding
+
+
+
+\---
+
+
+
+\## 4. Dataset Description
+
+
+
+\### Sentinel-1 SAR Data
+
+
+
+\* Source: Copernicus Open Access Hub
+
+\* Dataset ID: `COPERNICUS/S1\_GRD`
+
+\* Mode: Interferometric Wide Swath (IW)
+
+\* Polarization: VV
+
+\* Orbit: Descending
+
+
+
+\### JRC Global Surface Water
+
+
+
+\* Dataset: `JRC/GSW1\_4/GlobalSurfaceWater`
+
+\* Used for masking permanent water bodies
+
+
+
+\---
+
+
+
+\## 5. Methodology
+
+
+
+\### 5.1 Temporal Image Selection
+
+
+
+Two time windows are selected:
+
+
+
+\* \*\*Pre-flood period:\*\* June 1–15, 2022
+
+\* \*\*Post-flood period:\*\* July 1–15, 2022
+
+
+
+Median compositing is applied to reduce temporal noise.
+
+
+
+\---
+
+
+
+\### 5.2 SAR Backscatter Principle
+
+
+
+In SAR imagery:
+
+
+
+\* Water surfaces → \*\*low backscatter (dark pixels)\*\*
+
+\* Land surfaces → \*\*higher backscatter\*\*
+
+
+
+This difference is used for classification.
+
+
+
+\---
+
+
+
+\### 5.3 Noise Reduction
+
+
+
+SAR images contain speckle noise. To mitigate this:
+
+
+
+\* Apply \*\*focal mean filtering (30m radius)\*\*
+
+\* Smooth local variations
+
+
+
+\---
+
+
+
+\### 5.4 Water Classification
+
+
+
+A threshold-based approach is used:
+
+
+
+\* Water condition:
+
+
+
+```text
+
+Backscatter < -17 dB
+
+```
+
+
+
+Outputs:
+
+
+
+\* `before\_water`
+
+\* `after\_water`
+
+
+
+\---
+
+
+
+\### 5.5 Flood Detection Logic
+
+
+
+Flood is defined as:
+
+
+
+```text
+
+Flood = After Water AND NOT Before Water
+
+```
+
+
+
+This isolates \*\*newly formed water bodies\*\*, removing pre-existing water.
+
+
+
+\---
+
+
+
+\### 5.6 Permanent Water Removal
+
+
+
+Using JRC dataset:
+
+
+
+\* Pixels with >50% occurrence are treated as permanent water
+
+\* These are excluded from flood detection
+
+
+
+\---
+
+
+
+\### 5.7 Spatial Filtering
+
+
+
+To improve map quality:
+
+
+
+\* \*\*Connected pixel filtering\*\*
+
+
+
+&#x20; \* Removes isolated noise
+
+\* \*\*Morphological smoothing\*\*
+
+
+
+&#x20; \* Expands and connects nearby flood regions
+
+
+
+\---
+
+
+
+\### 5.8 Flood Area Estimation
+
+
+
+Steps:
+
+
+
+1\. Convert flood mask to area using `pixelArea()`
+
+2\. Sum all pixels using `reduceRegion()`
+
+3\. Convert to square kilometers
+
+
+
+\---
+
+
+
+\## 6. Results
 
 
 
 \* \*\*Estimated Flood Area:\*\* \~550 sq km
 
-\* \*\*Region:\*\* Assam, India
+\* \*\*Spatial Pattern Observed:\*\*
 
-\* Flood regions align with river basins and floodplains
+
+
+&#x20; \* Concentration along river channels
+
+&#x20; \* Spread into adjacent floodplains
+
+&#x20; \* Clusters near Brahmaputra basin
 
 
 
@@ -76,17 +318,57 @@ By comparing pre-flood and post-flood satellite images, the model identifies new
 
 
 
-\## 🛰️ Technologies Used
+\## 7. Output Visualization
 
 
 
-\* Python
+The visualization displays:
+
+
+
+\* Grayscale SAR background
+
+\* Flooded regions highlighted in blue
+
+
+
+Image: `output.png`
+
+
+
+\---
+
+
+
+\## 8. Technical Implementation
+
+
+
+\### Core Libraries
+
+
 
 \* Google Earth Engine API
 
 \* Geemap
 
-\* Sentinel-1 SAR Data
+\* Python
+
+
+
+\### Key Operations
+
+
+
+\* ImageCollection filtering
+
+\* Raster thresholding
+
+\* Logical masking
+
+\* Morphological operations
+
+\* Regional reduction
 
 
 
@@ -94,7 +376,75 @@ By comparing pre-flood and post-flood satellite images, the model identifies new
 
 
 
-\## 🚀 How to Run
+\## 9. Performance Considerations
+
+
+
+\* Computation performed on Google Earth Engine cloud
+
+\* Efficient handling of large-scale satellite datasets
+
+\* Scale parameter (30m) balances:
+
+
+
+&#x20; \* Accuracy
+
+&#x20; \* Computational cost
+
+
+
+\---
+
+
+
+\## 10. Limitations
+
+
+
+\* Threshold-based classification may:
+
+
+
+&#x20; \* Misclassify wet soil as water
+
+&#x20; \* Miss shallow flooding
+
+\* SAR shadow effects in hilly terrain
+
+\* No validation with ground-truth data
+
+
+
+\---
+
+
+
+\## 11. Future Work
+
+
+
+\* Integrate \*\*NDVI\*\* for vegetation damage analysis
+
+\* Apply \*\*DEM-based masking\*\* to remove slope-induced errors
+
+\* Use \*\*machine learning classification models\*\*
+
+\* Add \*\*multi-date flood progression tracking\*\*
+
+\* Build \*\*interactive dashboard for disaster response\*\*
+
+
+
+\---
+
+
+
+\## 12. Reproducibility
+
+
+
+\### Installation
 
 
 
@@ -103,6 +453,14 @@ By comparing pre-flood and post-flood satellite images, the model identifies new
 pip install earthengine-api geemap
 
 ```
+
+
+
+\---
+
+
+
+\### Authentication
 
 
 
@@ -118,9 +476,33 @@ ee.Initialize()
 
 
 
+\---
+
+
+
+\### Execution
+
+
+
+Run the notebook:
+
+
+
 ```bash
 
-python flood\_detection.py
+jupyter notebook
+
+```
+
+
+
+Open:
+
+
+
+```
+
+flood\_detection.ipynb
 
 ```
 
@@ -130,35 +512,23 @@ python flood\_detection.py
 
 
 
-\## 🧠 Key Learnings
+\## 13. Repository Structure
 
 
 
-\* SAR-based flood detection using backscatter analysis
+```text
 
-\* Handling speckle noise in satellite imagery
+Flood-Detection-GEE/
 
-\* Spatial filtering and smoothing techniques
+│── flood\_detection.ipynb
 
-\* Cloud-based geospatial analysis with Earth Engine
+│── output.png
 
+│── requirements.txt
 
+│── README.md
 
-\---
-
-
-
-\## 🔮 Future Improvements
-
-
-
-\* NDVI-based vegetation damage analysis
-
-\* Multi-date flood progression tracking
-
-\* Machine learning-based classification
-
-\* Integration with real-time disaster monitoring
+```
 
 
 
@@ -166,13 +536,51 @@ python flood\_detection.py
 
 
 
-\## 👩‍💻 Author
+\## 14. Key Contributions
 
 
 
-\*\*Shivani Negi\*\*
+\* End-to-end SAR-based flood detection pipeline
+
+\* Noise-robust flood extraction method
+
+\* Automated flood area estimation
+
+\* Cloud-based geospatial analysis using GEE
+
+
+
+\---
+
+
+
+\## 15. Author
+
+
+
+Shivani Negi
 
 GitHub: https://github.com/kmshivani05
+
+
+
+\---
+
+
+
+\## 16. References
+
+
+
+\* ESA Sentinel-1 Mission
+
+\* Google Earth Engine Documentation
+
+\* JRC Global Surface Water Dataset
+
+
+
+\---
 
 
 
