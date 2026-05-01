@@ -10,15 +10,23 @@
 
 
 
-Floods are one of the most frequent and damaging natural disasters, particularly in regions with extensive river systems such as Assam, India. Traditional optical satellite methods often fail during flood events due to heavy cloud cover.
+Floods are among the most destructive natural disasters, especially in regions like Assam, India where river systems overflow during monsoon seasons. Optical satellite imagery often fails due to cloud cover during such events.
 
 
 
-This project implements a \*\*satellite-based flood detection pipeline\*\* using \*\*Sentinel-1 Synthetic Aperture Radar (SAR)\*\* data, which is capable of capturing surface conditions regardless of weather or daylight.
+This project uses \*\*Sentinel-1 SAR (Synthetic Aperture Radar)\*\* data, which can penetrate clouds and capture surface conditions in all weather, to detect flood-affected areas accurately.
 
 
 
-The system detects \*\*newly inundated areas\*\* by comparing temporal satellite observations and applies spatial filtering techniques to produce reliable flood maps.
+\### Output Preview
+
+
+
+!\[Flood Detection Output](output.png)
+
+
+
+The blue regions represent \*\*detected flood areas\*\*, primarily concentrated along river basins and low-lying floodplains.
 
 
 
@@ -30,19 +38,19 @@ The system detects \*\*newly inundated areas\*\* by comparing temporal satellite
 
 
 
-The objective is to:
+The goal of this project is to:
 
 
 
-\* Detect flood-affected regions using SAR imagery
+\* Detect flood-affected areas using SAR imagery
 
-\* Distinguish \*\*temporary flood water\*\* from permanent water bodies
+\* Identify \*\*new water bodies formed after flooding\*\*
 
-\* Reduce speckle noise inherent in SAR data
+\* Remove permanent water bodies
 
-\* Generate a clean flood mask
+\* Reduce SAR noise (speckle effect)
 
-\* Estimate total flooded area in square kilometers
+\* Estimate total flooded area (in sq km)
 
 
 
@@ -58,15 +66,15 @@ The objective is to:
 
 \* \*\*Coordinates:\*\* \[91, 25, 93, 27]
 
-\* \*\*Geographical Characteristics:\*\*
+\* \*\*Characteristics:\*\*
 
 
 
-&#x20; \* Dominated by Brahmaputra river basin
+&#x20; \* Brahmaputra river basin
 
-&#x20; \* High flood vulnerability due to flat terrain
+&#x20; \* High flood vulnerability
 
-&#x20; \* Seasonal monsoon flooding
+&#x20; \* Flat terrain with seasonal inundation
 
 
 
@@ -74,33 +82,31 @@ The objective is to:
 
 
 
-\## 4. Dataset Description
+\## 4. Dataset Used
 
 
 
-\### Sentinel-1 SAR Data
+\### Sentinel-1 SAR
 
 
 
-\* Source: Copernicus Open Access Hub
+\* Dataset: `COPERNICUS/S1\_GRD`
 
-\* Dataset ID: `COPERNICUS/S1\_GRD`
-
-\* Mode: Interferometric Wide Swath (IW)
+\* Mode: IW (Interferometric Wide Swath)
 
 \* Polarization: VV
 
-\* Orbit: Descending
+\* Orbit: DESCENDING
 
 
 
-\### JRC Global Surface Water
+\### Surface Water Dataset
 
 
 
 \* Dataset: `JRC/GSW1\_4/GlobalSurfaceWater`
 
-\* Used for masking permanent water bodies
+\* Purpose: Remove permanent water bodies
 
 
 
@@ -112,21 +118,17 @@ The objective is to:
 
 
 
-\### 5.1 Temporal Image Selection
+\### 5.1 Time Selection
 
 
 
-Two time windows are selected:
+\* Before flood: June 1–15, 2022
+
+\* After flood: July 1–15, 2022
 
 
 
-\* \*\*Pre-flood period:\*\* June 1–15, 2022
-
-\* \*\*Post-flood period:\*\* July 1–15, 2022
-
-
-
-Median compositing is applied to reduce temporal noise.
+Median images are computed to reduce temporal noise.
 
 
 
@@ -134,73 +136,25 @@ Median compositing is applied to reduce temporal noise.
 
 
 
-\### 5.2 SAR Backscatter Principle
+\### 5.2 SAR-Based Water Detection
 
 
 
-In SAR imagery:
+\* Water appears \*\*dark\*\* in SAR (low backscatter)
+
+\* Land appears \*\*brighter\*\*
 
 
 
-\* Water surfaces → \*\*low backscatter (dark pixels)\*\*
-
-\* Land surfaces → \*\*higher backscatter\*\*
-
-
-
-This difference is used for classification.
-
-
-
-\---
-
-
-
-\### 5.3 Noise Reduction
-
-
-
-SAR images contain speckle noise. To mitigate this:
-
-
-
-\* Apply \*\*focal mean filtering (30m radius)\*\*
-
-\* Smooth local variations
-
-
-
-\---
-
-
-
-\### 5.4 Water Classification
-
-
-
-A threshold-based approach is used:
-
-
-
-\* Water condition:
+Threshold used:
 
 
 
 ```text
 
-Backscatter < -17 dB
+Backscatter < -17 dB → Water
 
 ```
-
-
-
-Outputs:
-
-
-
-\* `before\_water`
-
-\* `after\_water`
 
 
 
@@ -208,7 +162,7 @@ Outputs:
 
 
 
-\### 5.5 Flood Detection Logic
+\### 5.3 Flood Extraction
 
 
 
@@ -224,7 +178,7 @@ Flood = After Water AND NOT Before Water
 
 
 
-This isolates \*\*newly formed water bodies\*\*, removing pre-existing water.
+This ensures only \*\*newly flooded regions\*\* are captured.
 
 
 
@@ -232,7 +186,7 @@ This isolates \*\*newly formed water bodies\*\*, removing pre-existing water.
 
 
 
-\### 5.6 Permanent Water Removal
+\### 5.4 Permanent Water Removal
 
 
 
@@ -240,35 +194,9 @@ Using JRC dataset:
 
 
 
-\* Pixels with >50% occurrence are treated as permanent water
+\* Pixels with >50% water occurrence are removed
 
-\* These are excluded from flood detection
-
-
-
-\---
-
-
-
-\### 5.7 Spatial Filtering
-
-
-
-To improve map quality:
-
-
-
-\* \*\*Connected pixel filtering\*\*
-
-
-
-&#x20; \* Removes isolated noise
-
-\* \*\*Morphological smoothing\*\*
-
-
-
-&#x20; \* Expands and connects nearby flood regions
+\* Ensures lakes and rivers are excluded
 
 
 
@@ -276,19 +204,31 @@ To improve map quality:
 
 
 
-\### 5.8 Flood Area Estimation
+\### 5.5 Noise Reduction
 
 
 
-Steps:
+\* Focal mean filter applied
+
+\* Connected pixel filtering removes small noisy patches
+
+\* Morphological smoothing improves spatial continuity
 
 
 
-1\. Convert flood mask to area using `pixelArea()`
+\---
 
-2\. Sum all pixels using `reduceRegion()`
 
-3\. Convert to square kilometers
+
+\### 5.6 Flood Area Calculation
+
+
+
+\* Pixel area computed using `pixelArea()`
+
+\* Summed using `reduceRegion()`
+
+\* Converted to square kilometers
 
 
 
@@ -302,37 +242,15 @@ Steps:
 
 \* \*\*Estimated Flood Area:\*\* \~550 sq km
 
-\* \*\*Spatial Pattern Observed:\*\*
+\* Flood distribution observed:
 
 
 
-&#x20; \* Concentration along river channels
+&#x20; \* Along river channels
 
-&#x20; \* Spread into adjacent floodplains
+&#x20; \* Across floodplains
 
-&#x20; \* Clusters near Brahmaputra basin
-
-
-
-\---
-
-
-
-\## 7. Output Visualization
-
-
-
-The visualization displays:
-
-
-
-\* Grayscale SAR background
-
-\* Flooded regions highlighted in blue
-
-
-
-Image: `output.png`
+&#x20; \* Near low elevation zones
 
 
 
@@ -340,111 +258,43 @@ Image: `output.png`
 
 
 
-\## 8. Technical Implementation
+\## 7. Visualization
 
 
 
-\### Core Libraries
+\* Grayscale: SAR imagery
+
+\* Blue overlay: Flooded areas
+
+\* Clear clustering near Brahmaputra river basin
 
 
+
+\---
+
+
+
+\## 8. Tech Stack
+
+
+
+\* Python
 
 \* Google Earth Engine API
 
 \* Geemap
 
-\* Python
-
-
-
-\### Key Operations
-
-
-
-\* ImageCollection filtering
-
-\* Raster thresholding
-
-\* Logical masking
-
-\* Morphological operations
-
-\* Regional reduction
-
 
 
 \---
 
 
 
-\## 9. Performance Considerations
+\## 9. How to Run
 
 
 
-\* Computation performed on Google Earth Engine cloud
-
-\* Efficient handling of large-scale satellite datasets
-
-\* Scale parameter (30m) balances:
-
-
-
-&#x20; \* Accuracy
-
-&#x20; \* Computational cost
-
-
-
-\---
-
-
-
-\## 10. Limitations
-
-
-
-\* Threshold-based classification may:
-
-
-
-&#x20; \* Misclassify wet soil as water
-
-&#x20; \* Miss shallow flooding
-
-\* SAR shadow effects in hilly terrain
-
-\* No validation with ground-truth data
-
-
-
-\---
-
-
-
-\## 11. Future Work
-
-
-
-\* Integrate \*\*NDVI\*\* for vegetation damage analysis
-
-\* Apply \*\*DEM-based masking\*\* to remove slope-induced errors
-
-\* Use \*\*machine learning classification models\*\*
-
-\* Add \*\*multi-date flood progression tracking\*\*
-
-\* Build \*\*interactive dashboard for disaster response\*\*
-
-
-
-\---
-
-
-
-\## 12. Reproducibility
-
-
-
-\### Installation
+\### Install Dependencies
 
 
 
@@ -460,7 +310,7 @@ pip install earthengine-api geemap
 
 
 
-\### Authentication
+\### Authenticate
 
 
 
@@ -480,11 +330,7 @@ ee.Initialize()
 
 
 
-\### Execution
-
-
-
-Run the notebook:
+\### Run Notebook
 
 
 
@@ -512,11 +358,11 @@ flood\_detection.ipynb
 
 
 
-\## 13. Repository Structure
+\## 10. Project Structure
 
 
 
-```text
+```
 
 Flood-Detection-GEE/
 
@@ -536,17 +382,15 @@ Flood-Detection-GEE/
 
 
 
-\## 14. Key Contributions
+\## 11. Limitations
 
 
 
-\* End-to-end SAR-based flood detection pipeline
+\* Threshold-based detection may misclassify wet soil
 
-\* Noise-robust flood extraction method
+\* No ground truth validation
 
-\* Automated flood area estimation
-
-\* Cloud-based geospatial analysis using GEE
+\* SAR shadow effects in hilly regions
 
 
 
@@ -554,7 +398,45 @@ Flood-Detection-GEE/
 
 
 
-\## 15. Author
+\## 12. Future Improvements
+
+
+
+\* NDVI-based vegetation damage analysis
+
+\* DEM-based terrain correction
+
+\* Machine learning flood classification
+
+\* Multi-date flood progression mapping
+
+\* Web dashboard for real-time monitoring
+
+
+
+\---
+
+
+
+\## 13. Key Highlights
+
+
+
+\* Uses SAR for all-weather flood detection
+
+\* Efficient large-scale processing with GEE
+
+\* Clean flood extraction using logical masking
+
+\* Accurate area estimation
+
+
+
+\---
+
+
+
+\## 14. Author
 
 
 
@@ -568,15 +450,15 @@ GitHub: https://github.com/kmshivani05
 
 
 
-\## 16. References
+\## 15. References
 
 
 
-\* ESA Sentinel-1 Mission
+\* Sentinel-1 SAR (ESA)
 
-\* Google Earth Engine Documentation
+\* Google Earth Engine Docs
 
-\* JRC Global Surface Water Dataset
+\* JRC Global Surface Water
 
 
 
